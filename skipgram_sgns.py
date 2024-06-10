@@ -1,12 +1,11 @@
 '''
 TO-DO
-- maybe sparse learning vectors? if vector is binary than no need to update entries with no context?  
-- Possible improvement - dinamically increrase window size if a stop word context word is found.
+- Maybe sparse learning vectors? If vector is binary than no need to update entries with no context?  
+- Possible improvement - Dinamically increrase window size if a stop word context word is found.
 '''
 
 import numpy as np
 import collections
-from collections import defaultdict
 import pickle
 import os
 import random
@@ -29,6 +28,7 @@ def who_am_i():
     Make sure you return your own info!
     """
     return {'name': 'Shahar Oded', 'id': '208388918', 'email': 'odedshah@post.bgu.ac.il'}
+
 
 def expand_contractions(text):
     contractions_dict = {
@@ -73,12 +73,11 @@ def _get_wordnet_pos(word):
 
 
 def normalize_sentence(sentence, lemmatize=False, use_pos=False):
-    """Normalize a sentence by tokenizing, lemmatizing, and removing punctuation.
+    """
+    Normalize a sentence by tokenizing, lemmatizing, and removing punctuation.
 
     Args:
         sentence: a single sentence as a string
-        nltk_tokenize: use NLTK's word_tokenize to split words. If False, function will use 
-                        split() and will remove punctuation from each word (default: False).
         lemmatize: whether to lemmatize words (default: False)
         use_pos: whether to use POS tagging for lemmatization (default: False)
 
@@ -108,7 +107,8 @@ def normalize_sentence(sentence, lemmatize=False, use_pos=False):
 
 
 def normalize_text(fn):
-    """Loading a text file, normalizing it, and returning a list of sentences.
+    """
+    Loading a text file, normalizing it, and returning a list of sentences.
 
     Args:
         fn: full path to the text file to process
@@ -204,7 +204,7 @@ class SkipGram:
         w1_norm = normalize_sentence(w1)
         w2_norm = normalize_sentence(w2)
         # Check if both words are in our word_index map
-        if any(w1_norm not in self.vocab, w2_norm not in self.vocab):
+        if any([w1_norm not in self.vocab, w2_norm not in self.vocab]):
            self.print_flag and print('''[Warning]: One of the words in your input is not in the vocabulary.
                                      A default value returned''') 
            return 0.0
@@ -225,11 +225,14 @@ class SkipGram:
 
 
     def get_closest_words(self, w, n=5):
-        """Returns a list containing the n words that are the closest to the specified word.
+        """
+        Returns a list containing the n words that are the closest to the specified word.
 
         Args:
             w: the word to find close words to.
             n: the number of words to return. Defaults to 5.
+        
+        Returns: List() of size n.
         """
         w_norm = normalize_sentence(w)
         if w_norm not in self.vocab:
@@ -559,9 +562,10 @@ class SkipGram:
 
 
     def test_analogy(self, w1, w2, w3, w4, n=1):
-        """Returns True if sim(w1-w2+w3, w4)@n; Otherwise return False.
-            That is, returning True if w4 is one of the n closest words to the vector w1-w2+w3.
-            Interpretation: 'w1 to w2 is like w4 to w3'
+        """
+        Returns True if sim(w1-w2+w3, w4)@n; Otherwise return False.
+        That is, returning True if w4 is one of the n closest words to the vector w1-w2+w3.
+        Interpretation: 'w1 to w2 is like w4 to w3'
 
         Args:
              w1: first word in the analogy (string)
@@ -569,7 +573,7 @@ class SkipGram:
              w3: third word in the analogy (string)
              w4: forth word in the analogy (string)
              n: the distance (work rank) to be accepted as similarity
-            """
+        """
         w1, w2, w3, w4_norm = normalize_sentence(w1), normalize_sentence(w2), normalize_sentence(w3), normalize_sentence(w4)
         # Check if all words are in the vocabulary
         if any(w not in self.vocab for w in [w1, w2, w3, w4_norm]):
@@ -578,5 +582,4 @@ class SkipGram:
         # Assuming analogy is found by combining w1 - w2 + w3 =~ w4
         analogy = self.find_analogy(w1, w2, w3)
         closest_words = self.get_closest_words(analogy, n)
-        print(analogy, closest_words)
         return w4_norm in closest_words or w4_norm == analogy

@@ -87,11 +87,10 @@ class TestSkipGram(unittest.TestCase):
             ('house', 'mouse', 'box', 'fox'),
             ('game', 'slow', 'socks', 'big'),
             ('luke', 'luck', 'lake', 'like'),
-            ('battle', 'beetles', 'puddle', 'paddle')
-            
-            # ("harry", "voldemort", "hagrid", "wand"),
-            # ("wand", "spell", "car", "drive"),
-            # ("harry", "ron", "hermione", "car")
+            ('battle', 'beetles', 'puddle', 'paddle'),            
+            ("harry", "voldemort", "hagrid", "wand"),
+            ("wand", "spell", "car", "drive"),
+            ("harry", "ron", "hermione", "car")
         ]
         for w1, w2, w3, w4 in tests:
             try:
@@ -102,17 +101,69 @@ class TestSkipGram(unittest.TestCase):
             except ValueError as e:
                 print(f"Error: {e}")
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python test_skipgram.py <corpora_file_path>")
-        sys.exit(1)
-    
-    corpora_file_path = sys.argv[1]
+    def test_similarity(self):
+        model = load_model(self.model_path)
+        w1, w2 = 'house', 'mouse'
+        sim = model.compute_similarity(w1, w2)
+        print(f"Similarity between '{w1}' and '{w2}': {sim}")
+        self.assertTrue(0 <= sim <= 1)
+        
+        model = load_model(self.model_path)
+        w1, w2 = 'cat', 'dog'
+        sim = model.compute_similarity(w1, w2)
+        print(f"Similarity between '{w1}' and '{w2}': {sim}")
+        self.assertTrue(0 <= sim <= 1)
+        
+        model = load_model(self.model_path)
+        w1, w2 = 'harry', 'voldemort'
+        sim = model.compute_similarity(w1, w2)
+        print(f"Similarity between '{w1}' and '{w2}': {sim}")
+        self.assertTrue(0 <= sim <= 1)
 
-    # Assign the corpora_file_path to the test class
-    TestSkipGram.corpora_file_path = corpora_file_path
-    
-    # Remove the first argument to prevent unittest from processing it
-    sys.argv = [sys.argv[0]]
-    
+    def test_combine_vectors(self):
+        model = load_model(self.model_path)
+        
+        combined_V = model.combine_vectors(model.T, model.C, combo=1)
+        self.assertEqual(combined_V.shape, (model.d, model.vocab_size))
+        print(f"Combined vectors shape: {combined_V.shape}")
+        
+        combined_V = model.combine_vectors(model.T, model.C, combo=1)
+        self.assertEqual(combined_V.shape, (model.d, model.vocab_size))
+        print(f"Combined vectors shape: {combined_V.shape}")
+        
+        combined_V = model.combine_vectors(model.T, model.C, combo=2)
+        self.assertEqual(combined_V.shape, (model.d, model.vocab_size))
+        print(f"Combined vectors shape: {combined_V.shape}")
+        
+        combined_V = model.combine_vectors(model.T, model.C, combo=3)
+        self.assertEqual(combined_V.shape, (model.d, model.vocab_size))
+        print(f"Combined vectors shape: {combined_V.shape}")
+        
+        combined_V = model.combine_vectors(model.T, model.C, combo=4)
+        self.assertEqual(combined_V.shape, (model.d, 2 * model.vocab_size))
+        print(f"Combined vectors shape: {combined_V.shape}")
+        
+        combined_V = model.combine_vectors(model.T, model.C, combo=5)
+        self.assertEqual(combined_V.shape, (model.d, model.vocab_size))
+        print(f"Combined vectors shape: {combined_V.shape}")
+
+
+    def test_get_closest_words(self):
+        model = load_model(self.model_path)
+        word = 'house'
+        closest_words = model.get_closest_words(word, n=5)
+        print(f"Closest words to '{word}': {closest_words}")
+        self.assertTrue(len(closest_words) > 0)
+        self.assertTrue(all(isinstance(w, str) for w in closest_words))
+        
+        word = 'potter'
+        closest_words = model.get_closest_words(word, n=5)
+        print(f"Closest words to '{word}': {closest_words}")
+        self.assertTrue(len(closest_words) > 0)
+        self.assertTrue(all(isinstance(w, str) for w in closest_words))
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        raise ValueError("Usage: python test_skipgram.py <corpora_file_path>")
+    TestSkipGram.corpora_file_path = sys.argv.pop()  # Pass the corpora file path to the class
     unittest.main()
