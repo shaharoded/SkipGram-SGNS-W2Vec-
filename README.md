@@ -17,9 +17,12 @@ This project implements the SkipGram Word2Vec model using SkipGram with Negative
     cd skipgram-sgns
     ```
 
-2. **Install Dependencies**
+2. **Install Dependencies on Virtual Enviroment**
 
     ```bash
+    python -m venv venv
+    venv\Scripts\Activate
+    python -m pip install --upgrade pip
     pip install -r requirements.txt
     ```
 

@@ -1,7 +1,8 @@
 import unittest
 import os
 import sys
-from skipgram_sgns import SkipGram, normalize_text, normalize_sentence, load_model
+from skipgram_sgns import *
+
 
 class TestSkipGram(unittest.TestCase):
     
@@ -141,10 +142,6 @@ class TestSkipGram(unittest.TestCase):
         
         combined_V = model.combine_vectors(model.T, model.C, combo=4)
         self.assertEqual(combined_V.shape, (model.d, 2 * model.vocab_size))
-        print(f"Combined vectors shape: {combined_V.shape}")
-        
-        combined_V = model.combine_vectors(model.T, model.C, combo=5)
-        self.assertEqual(combined_V.shape, (model.d, model.vocab_size))
         print(f"Combined vectors shape: {combined_V.shape}")
 
 

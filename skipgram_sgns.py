@@ -18,9 +18,13 @@ from nltk.tokenize import sent_tokenize
 from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 
+nltk.data.clear_cache()
 nltk.download('punkt')
+nltk.download('punkt_tab')
 nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
+nltk.download('averaged_perceptron_tagger_eng')
+
 
 def who_am_i():
     """
@@ -376,10 +380,8 @@ class SkipGram:
         """
         hidden = self.T[:, t_index][:, None]
         y = c_vector    # context vector is the actual y value for supervised task
-        C_context = self.C
-
-        output_layer = np.dot(C_context, hidden).flatten()
-        y_pred = sigmoid(output_layer)
+        output_layer = np.dot(self.C, hidden).flatten()
+        y_pred = sigmoid(output_layer)  # Can be replaced with softmax
 
         return hidden, y_pred, y
 
@@ -399,19 +401,13 @@ class SkipGram:
     def _backpropagation(self, t_index, hidden, y_pred, y, step_size):
         '''
         Calculate the error vector and use it to calculate the gradients.
-        Given that y, y_pred are probabilities, e is a diff_proba vector, which will
-        converge self.C and self.T towards their ideaal vaues.
+        Updates the matrices T and C according to the gradients.
         '''
-        e = y_pred - y  # e shape: (239,)
-        e = e[:, None]  # re shape: (239, 1)
-        C_context = self.C
-
-        c_grad = np.dot(hidden, e.T).T  # c_grad shape: (239, 100)
-        t_grad = np.dot(C_context.T, e).squeeze()    # t_grad shape: (100,)
-
+        error = y_pred - y  # error shape: (|V|,) where |V| is the vocabulary size
+        c_grad = np.dot(error[:, None], hidden.T)  # c_grad shape: (|V|, d)
+        t_grad = np.dot(self.C.T, error)  # t_grad shape: (d,)
         self.C -= step_size * c_grad
         self.T[:, t_index] -= step_size * t_grad
-
         return self.T, self.C
     
     
