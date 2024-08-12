@@ -26,14 +26,6 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('averaged_perceptron_tagger_eng')
 
 
-def who_am_i():
-    """
-    Returns a dictionary with your name, id number and email. keys=['name', 'id','email']
-    Make sure you return your own info!
-    """
-    return {'name': 'Shahar Oded', 'id': '208388918', 'email': 'odedshah@post.bgu.ac.il'}
-
-
 def expand_contractions(text):
     contractions_dict = {
         "'s": " is",
