@@ -1,6 +1,6 @@
 # SkipGram Word2Vec Model with SGNS
 
-This project implements the SkipGram Word2Vec model using SkipGram with Negative Sampling (SGNS), on a Numpy structure. The main components of the project include data preprocessing, training the model, and performing word analogy and similarity tasks. The model can be trained on any text corpora provided by the user.
+This project implements the SkipGram Word2Vec model using SkipGram with Negative Sampling (SGNS), on a Numpy structure (instead of an NN structure). The main components of the project include data preprocessing, training the model, and performing word analogy and similarity tasks. The model can be trained on any text corpora provided by the user.
 
 ![Network Visualization](Images/Picture.png)
 
@@ -30,7 +30,7 @@ This project implements the SkipGram Word2Vec model using SkipGram with Negative
     pip install -r requirements.txt
     ```
 
-3. **Run Unittests**
+3. **Run tests**
 
     ```bash
     python test_skipgram.py {file_path}
@@ -39,6 +39,12 @@ This project implements the SkipGram Word2Vec model using SkipGram with Negative
     For example:
 
     ```bash
-    python test_skipgram.py Corpora/drSeuss.txt
-    python test_skipgram.py Corpora/harryPotter1.txt
+    python unittest_skipgram.py Corpora/drSeuss.txt
+    python unittest_skipgram.py Corpora/harryPotter1.txt
+    ```
+    or
+
+   ```bash
+    python tests_drSeuss.py
+    python tests_harryPotter.py
     ```
