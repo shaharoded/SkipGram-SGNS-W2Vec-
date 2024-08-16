@@ -212,6 +212,27 @@ class SkipGram:
                 out_sent.append(sentence)
         return out_sent
 
+
+    def _check_words_in_vocabulary(self, input_words):
+        """
+        Checks if the input words are in the vocabulary and prints a warning if any word is not recognized.
+
+        Args:
+            input_words: A list of words to check.
+
+        Returns:
+            bool: True if all words are in the vocabulary, False otherwise.
+        """
+        unrecognized_words = [word for word in input_words if word not in self.vocab]
+        
+        if unrecognized_words:
+            if self.print_flag:
+                print(f"[Warning]: The following word(s) are not in the vocabulary: {', '.join(unrecognized_words)}. "
+                    "A default value will be returned from the method.")
+            return False
+        
+        return True
+    
     
     def compute_similarity(self, w1, w2):
         """ 
@@ -230,9 +251,7 @@ class SkipGram:
         w1_norm = normalize_sentence(w1) if w1 not in self.vocab else w1
         w2_norm = normalize_sentence(w2) if w2 not in self.vocab else w2
         # Check if both words are in our word_index map
-        if any([w1_norm not in self.vocab, w2_norm not in self.vocab]):
-           self.print_flag and print('''[Warning]: One of the words in your input is not in the vocabulary.
-                                     A default value returned''') 
+        if not self._check_words_in_vocabulary([w1_norm, w2_norm]):
            return 0.0
 
         # Fetch the embeddings of the words using T&C
@@ -262,8 +281,8 @@ class SkipGram:
         Returns: List() of size n.
         """
         w_norm = normalize_sentence(w) if w not in self.vocab else w
-        if w_norm not in self.vocab:
-            raise ValueError(f"Word '{w}' not in vocabulary.")
+        if not self._check_words_in_vocabulary([w_norm]):
+            return []
         
         w_index = self.word_index[w_norm]
         word_emb = self.V[:, w_index]
@@ -517,7 +536,7 @@ class SkipGram:
         Args:
             T: The learned targets (T) embeddings (as returned from learn_embeddings())
             C: The learned contexts (C) embeddings (as returned from learn_embeddings())
-            combo: indicates how wo combine the T and C embeddings (int)
+            combo: indicates how to combine the T and C embeddings (int)
                    0: use only the T embeddings (default)
                    1: use only the C embeddings (transposed)
                    2: return a pointwise average of C and T
@@ -560,8 +579,8 @@ class SkipGram:
         w1_norm = normalize_sentence(w1) if w1 not in self.vocab else w1
         w2_norm = normalize_sentence(w2) if w2 not in self.vocab else w2
         w3_norm = normalize_sentence(w3) if w3 not in self.vocab else w3
-        if any(w not in self.vocab for w in [w1_norm, w2_norm, w3_norm]):
-            raise ValueError("At least one of the words is not in the vocabulary.")
+        if not self._check_words_in_vocabulary([w1_norm, w2_norm, w3_norm]):
+            return 'Cannot find analogy'
 
         # Get the vector representations of the words & indices
         idx_1 = self.word_index[w1_norm]
@@ -583,7 +602,7 @@ class SkipGram:
         max_sorted = [idx for idx in max_sorted if idx not in [idx_1, idx_2, idx_3]] # Take min 1 out of 4 that is not an input
         
         if not max_sorted:
-            raise ValueError("Not enough words in the vocabulary to find a suitable analogy.")
+            raise ValueError("[Error]: Not enough words in the vocabulary to find a suitable analogy.")
 
         # take the first word that is not w1,w2,w3
         return self.index_word[max_sorted[0]]
@@ -608,8 +627,8 @@ class SkipGram:
         w4 = normalize_sentence(w4) if w4 not in self.vocab else w4
 
         # Check if all words are in the vocabulary
-        if any(w not in self.vocab for w in [w1, w2, w3, w4]):
-            raise ValueError("At least one of the words is not in the vocabulary.")
+        if not self._check_words_in_vocabulary([w1, w2, w3, w4]):
+            return False
         
         # Assuming analogy is found by combining w1 - w2 + w3 =~ w4
         analogy = self.find_analogy(w1, w2, w3)

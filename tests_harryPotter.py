@@ -36,8 +36,7 @@ def train_skipgram(file_path, model_name):
     sg_model.learn_embeddings(step_size=step_size, epochs=epochs, early_stopping=early_stopping, model_path=model_name)
 
     
-def test_model_attr(model_path):
-    model = load_model(model_path)
+def test_model_attr(model):
     
     # Check dimensions of embedding matrix T
     print(f"T shape: {model.T.shape}")
@@ -73,8 +72,7 @@ def test_model_attr(model_path):
     print("Model attribute checks completed.")
 
 
-def test_similarity(model_path):
-    model = load_model(model_path)
+def test_similarity(model):
     word1 = 'Dursley'
     word2 = 'Ollivander'
     similarity = model.compute_similarity(word1, word2)
@@ -86,8 +84,7 @@ def test_similarity(model_path):
     print(f'The similarity score between {word1} and {word2} is: {similarity}')
     
     
-def test_get_closest_words(model_path):
-    model = load_model(model_path)
+def test_get_closest_words(model):
     word = 'Dumbledore'
     closest_words = model.get_closest_words(word, n=5)
     print(f"Closest words to '{word}': {closest_words}")
@@ -109,8 +106,16 @@ if __name__ == "__main__":
     model_name = os.path.splitext(base_name)[0]
     model_path = f'skipgram_model_{model_name}.pkl'
 
-    test_normalization(file_path)
-    train_skipgram(file_path, model_path)
-    test_model_attr(file_path)
-    test_get_closest_words(model_path)
-    test_similarity(model_path)
+    print(model_path)
+    model = load_model(model_path)
+    
+    # test_normalization(file_path)
+    # train_skipgram(file_path, model_path)
+    # test_model_attr(model)
+    test_get_closest_words(model)
+    test_similarity(model)
+    
+    model.learn_embeddings(epochs=150, keep_train = True, model_path=model_name)
+    
+    test_get_closest_words(model)
+    test_similarity(model)
