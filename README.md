@@ -33,16 +33,16 @@ This project implements the SkipGram Word2Vec model using SkipGram with Negative
 3. **Run tests**
 
     ```bash
-    python test_skipgram.py {file_path}
+    python unittest_skipgram.py {file_path}
     ```
 
-    For example:
+    For example (for structure tests):
 
     ```bash
     python unittest_skipgram.py Corpora/drSeuss.txt
     python unittest_skipgram.py Corpora/harryPotter1.txt
     ```
-    or
+    or (for specific embedding tests per corpus)
 
    ```bash
     python tests_drSeuss.py
