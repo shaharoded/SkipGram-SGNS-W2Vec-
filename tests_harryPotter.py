@@ -24,7 +24,7 @@ def test_normalization(file_path):
     print(normalize_sentence(test_sentence, lemmatize=True, use_pos=True))
 
     
-def train_skipgram(file_path, model_name):
+def train_skipgram(file_path, model_path):
     normalized_sentences = normalize_text(file_path)
     sg_model = SkipGram(normalized_sentences, print_flag=True)
     
@@ -33,7 +33,7 @@ def train_skipgram(file_path, model_name):
     epochs = 50
     early_stopping = 3
 
-    sg_model.learn_embeddings(step_size=step_size, epochs=epochs, early_stopping=early_stopping, model_path=model_name)
+    sg_model.learn_embeddings(step_size=step_size, epochs=epochs, early_stopping=early_stopping, model_path=model_path)
 
     
 def test_model_attr(model):
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     test_get_closest_words(model)
     test_similarity(model)
     
-    model.learn_embeddings(epochs=150, keep_train = True, model_path=model_name)
+    model.learn_embeddings(epochs=150, keep_train = True, model_path=model_path)
     
     test_get_closest_words(model)
     test_similarity(model)

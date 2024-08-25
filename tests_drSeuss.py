@@ -1,16 +1,16 @@
 from skipgram_sgns import *
 
 
-def train_skipgram(file_path, model_name):
+def train_skipgram(file_path, model_path):
     normalized_sentences = normalize_text(file_path)
     sg_model = SkipGram(normalized_sentences, print_flag=True)
     
     # Train model
     step_size = 0.001
-    epochs = 150
+    epochs = 50
     early_stopping = 3
 
-    sg_model.learn_embeddings(step_size=step_size, epochs=epochs, early_stopping=early_stopping, model_path=model_name)
+    sg_model.learn_embeddings(step_size=step_size, epochs=epochs, early_stopping=early_stopping, model_path=model_path)
 
 def test_similarity(model_path):
     model = load_model(model_path)
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     model_name = os.path.splitext(base_name)[0]
     model_path = f'skipgram_model_{model_name}.pkl' 
     
-    train_skipgram(file_path, model_name)
+    # train_skipgram(file_path, model_path)
     test_similarity(model_path)
     test_get_closest_words(model_path)
     
