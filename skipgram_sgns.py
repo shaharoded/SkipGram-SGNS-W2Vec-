@@ -194,9 +194,10 @@ class SkipGram:
         # the context word embedding matrix 
         self.C = None
         
-        # each row -> word in the vocabulary
-        # each column -> a dimension of the embedding vector.
-        self.V = self.combine_vectors(self.T, self.C)   # the combination of T and C, Model's true vector
+        # Final embedding matrix - the combination of T and C, Model's true vector
+        # each column -> word in the vocabulary
+        # each row -> a dimension of the embedding vector.
+        self.V = None
 
 
     def _init_snip_sentences(self, sentences):
@@ -529,40 +530,55 @@ class SkipGram:
         return self.T, self.C
 
     
-    def combine_vectors(self, T, C, combo=0, model_path=None):
+    def combine_vectors(self, T=None, C=None, combo=0, model_path=None):
         """
-        Returns a single embedding matrix and saves it to the specified path
+        Returns a single embedding matrix and saves it to the specified path.
 
         Args:
-            T: The learned targets (T) embeddings (as returned from learn_embeddings())
-            C: The learned contexts (C) embeddings (as returned from learn_embeddings())
-            combo: indicates how to combine the T and C embeddings (int)
-                   0: use only the T embeddings (default)
-                   1: use only the C embeddings (transposed)
-                   2: return a pointwise average of C and T
-                   3: return the sum of C and T
-                   4: concat C and T vectors (effectively doubling the dimention of the embedding space)
-            model_path: full path (including file name) to save the model pickle at.
-        """        
-        if combo == 0:
-            V = T
-        elif combo == 1:
-            V = C.T
-        elif combo == 2:
-            V = np.add(T, C.T) / 2
-        elif combo == 3:
-            V = np.add(T, C.T)
-        elif combo == 4:
-            V = np.concatenate((T, C.T), axis=0)
-        else:
+            T: The learned targets (T) embeddings (as returned from learn_embeddings()).
+            C: The learned contexts (C) embeddings (as returned from learn_embeddings()).
+            combo: Indicates how to combine the T and C embeddings (int):
+                0: Use only the T embeddings (default).
+                1: Use only the C embeddings (transposed).
+                2: Return a pointwise average of C and T.
+                3: Return the sum of C and T.
+                4: Concatenate C and T vectors (effectively doubling the dimension of the embedding space).
+            model_path: Full path (including file name) to save the model pickle at.
+
+        Returns:
+            V: The combined embedding matrix based on the combo method specified.
+        """
+        # Early exit if T or C is missing
+        if T is None or C is None:
+            missing_matrices = ["T" if T is None else "", "C" if C is None else ""]
+            print(f'[Method Warning]: Missing matrices: {", ".join(filter(None, missing_matrices))}.')
+            if T is not None and combo == 0:
+                self.V = T
+                return T
+            return None
+
+        # Mapping combo options to operations
+        operations = {
+            0: T,
+            1: C.T,
+            2: (T + C.T) / 2,
+            3: T + C.T,
+            4: np.concatenate((T, C.T), axis=0)
+        }
+
+        # Validate combo and perform the operation
+        if combo not in operations:
             raise ValueError("Invalid combo option. Choose a number between 0 and 4.")
         
+        V = operations[combo]
         self.V = V
-        
+
+        # Save the model if a path is provided
         if model_path:
             with open(model_path, "wb") as file:
                 pickle.dump(self, file)
-
+            print(f'[Method Status]: Model saved to {model_path}')
+        
         return V
 
 
