@@ -77,7 +77,12 @@ def test_similarity(model):
     word2 = 'Ollivander'
     similarity = model.compute_similarity(word1, word2)
     print(f'The similarity score between {word1} and {word2} is: {similarity}')
-    
+
+    word1 = 'dursley'
+    word2 = 'ollivander'
+    similarity = model.compute_similarity(word1, word2)
+    print(f'The similarity score between {word1} and {word2} is: {similarity}')
+        
     word1 = 'wand'
     word2 = 'robe'
     similarity = model.compute_similarity(word1, word2)
@@ -98,6 +103,23 @@ def test_get_closest_words(model):
     print(f"Closest words to '{word}': {closest_words}")
 
 
+def test_analogies(model):
+    analogy_pairs = [
+        ('boy', 'wizard', 'girl', 'witch'),
+        ('Harry', 'Hermione', 'Dumbledore', 'Hagrid'),
+        ('Ron', 'Hermione', 'Dumbledore', 'Hagrid'),
+        ('harry', 'hermione', 'dumbledore', 'hagrid')
+    ]
+    correct = 0
+    for w1, w2, w3, w4 in analogy_pairs:
+        result = model.test_analogy(w1, w2, w3, w4, n=1)
+        print(f"Analogy: {w1} is to {w2} as {w3} is to {w4} - Result: {'Correct' if result else 'Incorrect'}")
+        if result:
+            correct += 1
+    
+    accuracy = correct / len(analogy_pairs)
+    print(f"Analogy test accuracy: {accuracy:.2%}")
+    
 
 if __name__ == "__main__":
     # file_path = 'Corpora/drSeuss.txt'
@@ -105,17 +127,18 @@ if __name__ == "__main__":
     base_name = os.path.basename(file_path)
     model_name = os.path.splitext(base_name)[0]
     model_path = f'skipgram_model_{model_name}.pkl'
-
-    print(model_path)
-    model = load_model(model_path)
     
     # test_normalization(file_path)
-    # train_skipgram(file_path, model_path)
-    # test_model_attr(model)
+    train_skipgram(file_path, model_path)
+    print(model_path)
+    model = load_model(model_path)
+    test_model_attr(model)
     test_get_closest_words(model)
     test_similarity(model)
+    test_analogies(model)
     
-    model.learn_embeddings(epochs=150, keep_train = True, model_path=model_path)
-    
-    test_get_closest_words(model)
-    test_similarity(model)
+    ## Continue training if model has not converged yet
+    # model.learn_embeddings(epochs=150, keep_train = True, model_path=model_path)    
+    # test_get_closest_words(model)
+    # test_similarity(model)
+    # test_analogies(model)

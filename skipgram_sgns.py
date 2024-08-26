@@ -31,6 +31,13 @@ lemmatizer = WordNetLemmatizer()
 # Load stopwords once globally
 STOP_WORDS = set(stopwords.words('english'))
 
+def who_am_i():
+    """
+    Returns a dictionary with your name, id number and email. keys=['name', 'id','email']
+    Make sure you return your own info!
+    """
+    return {'name': 'Shahar Oded', 'id': '208388918', 'email': 'odedshah@post.bgu.ac.il'}
+
 
 def expand_contractions(text):
     contractions_dict = {
@@ -229,7 +236,7 @@ class SkipGram:
     
     def compute_similarity(self, w1, w2):
         """ 
-        Returns the cosine similarity (in [0,1]) between the specified words.
+        Returns the cosine similarity (in [-1,1]) between the specified words.
         NOTE: Having no external control over the input, function assumes w1 and w2 are normalized.
         Function will check if they are a part of the vocab as is. If not - they will be normalized.
         In general, similarity is calculated between the 2 normalized words, so 2 non identical 
@@ -238,7 +245,7 @@ class SkipGram:
         Args:
             w1: a word
             w2: a word
-        Retunrns: a float in [0,1]; defaults to 0.0 if one of specified words is OOV (after normalization).
+        Returns: a float in [-1,1]; defaults to 0.0 if one of specified words is OOV (after normalization).
     """
         sim = 0.0  # default
         w1_norm = normalize_sentence(w1) if w1 not in self.vocab else w1
@@ -515,7 +522,7 @@ class SkipGram:
             if epochs_no_improve == early_stopping:
                 self.print_flag and print("[Training Status]: Stopped! Early stopping criteria met.")
                 break
-
+        
         self.print_flag and print(f"[Train Finished]: Model saved to path: '{model_path}'")
 
         # Return in case you wish to catch them
@@ -598,7 +605,9 @@ class SkipGram:
             raise ValueError("[Error]: Not enough words in the vocabulary to find a suitable analogy.")
 
         # take the first word that is not w1,w2,w3
-        return self.index_word[max_sorted[0]]
+        analogy = self.index_word[max_sorted[0]]
+        self.print_flag and print(f"[Method Result]: {w1} is to {w2} as {w3} is to {analogy}, based on the model.")
+        return analogy
 
 
     def test_analogy(self, w1, w2, w3, w4, n=1):
@@ -624,6 +633,6 @@ class SkipGram:
             return False
         
         # Assuming analogy is found by combining w1 - w2 + w3 =~ w4
-        analogy = self.find_analogy(w1, w2, w3)
+        analogy = self.find_analogy(w1, w2, w3) 
         closest_words = self.get_closest_words(analogy, n)
         return w4 in closest_words or w4 == analogy

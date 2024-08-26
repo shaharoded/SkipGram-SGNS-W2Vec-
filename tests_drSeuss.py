@@ -3,7 +3,7 @@ from skipgram_sgns import *
 
 def train_skipgram(file_path, model_path):
     normalized_sentences = normalize_text(file_path)
-    sg_model = SkipGram(normalized_sentences, print_flag=True)
+    sg_model = SkipGram(normalized_sentences, print_flag=False)
     
     # Train model
     step_size = 0.001
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     model_name = os.path.splitext(base_name)[0]
     model_path = f'skipgram_model_{model_name}.pkl' 
     
-    # train_skipgram(file_path, model_path)
+    train_skipgram(file_path, model_path)
     test_similarity(model_path)
     test_get_closest_words(model_path)
     
